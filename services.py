@@ -23,7 +23,7 @@ class ServiceResult:
 
 class BookService:
     """Service for book-related operations."""
-    
+
     # Cache the books list for better performance
     _books_cache: Optional[List[Book]] = None
 

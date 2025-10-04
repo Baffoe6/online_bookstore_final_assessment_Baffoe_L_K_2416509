@@ -5,20 +5,20 @@ Uses timeit and cProfile to measure and optimize critical application parts.
 """
 
 import cProfile
-import pstats
-import timeit
-import time
-from functools import wraps
-from typing import Dict, List, Any, Callable
-import sys
 import os
+import pstats
+import sys
+import time
+import timeit
+from functools import wraps
+from typing import Any, Callable, Dict, List
 
 # Add current directory to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from models_refactored import Book, Cart, CartItem, User, Order, ValidationUtils
-from services import BookService, CartService, UserService, OrderService
 from config import BOOK_CATALOG
+from models_refactored import Book, Cart, CartItem, Order, User, ValidationUtils
+from services import BookService, CartService, OrderService, UserService
 
 
 class PerformanceProfiler:
