@@ -441,7 +441,7 @@ class User:
 class Order:
     """Enhanced order model with comprehensive validation and backwards compatibility."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         """Initialize order with flexible constructor for backwards compatibility."""
         if len(args) == 3 and not kwargs:
             # Legacy signature: items, total_amount, shipping_address

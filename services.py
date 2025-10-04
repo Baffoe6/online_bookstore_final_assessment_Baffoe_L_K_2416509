@@ -33,11 +33,11 @@ class BookService:
         if BookService._books_cache is None:
             BookService._books_cache = [
                 Book(
-                    title=book_data["title"],
-                    author=book_data["author"],
-                    category=book_data["category"],
-                    price=book_data["price"],
-                    image_url=book_data["image_url"],
+                    title=str(book_data["title"]),
+                    author=str(book_data["author"]),
+                    category=str(book_data["category"]),
+                    price=float(str(book_data["price"])),
+                    image_url=str(book_data["image_url"]),
                 )
                 for book_data in BOOK_CATALOG
             ]
@@ -442,5 +442,5 @@ class EmailService:
 
 # Global storage for testing purposes
 # These are used by the test suite to mock data
-users = {}
-orders = {}
+users: Dict[str, User] = {}
+orders: Dict[str, Order] = {}

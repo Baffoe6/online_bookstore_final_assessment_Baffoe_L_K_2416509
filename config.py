@@ -52,12 +52,12 @@ class AppConfig:
     debug: bool = True
     host: str = "127.0.0.1"
     port: int = 5000
-    database: DatabaseConfig = None
-    security: SecurityConfig = None
-    payment: PaymentConfig = None
-    email: EmailConfig = None
+    database: Optional[DatabaseConfig] = None
+    security: Optional[SecurityConfig] = None
+    payment: Optional[PaymentConfig] = None
+    email: Optional[EmailConfig] = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.database is None:
             self.database = DatabaseConfig()
         if self.security is None:
