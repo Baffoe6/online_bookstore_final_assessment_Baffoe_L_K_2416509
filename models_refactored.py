@@ -352,7 +352,7 @@ class User:
         if len(password) < 8:
             raise ValueError("Password must be at least 8 characters long")
 
-        self._password_hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
+        self._password_hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt(rounds=10))
         self.name = name.strip()
         self.address = address.strip()
         self.orders: List[Order] = []
@@ -392,7 +392,7 @@ class User:
             raise ValueError("New password must be at least 8 characters long")
 
         self._password_hash = bcrypt.hashpw(
-            new_password.encode("utf-8"), bcrypt.gensalt()
+            new_password.encode("utf-8"), bcrypt.gensalt(rounds=10)
         )
 
     def add_order(self, order: Order) -> None:

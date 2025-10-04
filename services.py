@@ -23,20 +23,25 @@ class ServiceResult:
 
 class BookService:
     """Service for book-related operations."""
+    
+    # Cache the books list for better performance
+    _books_cache: Optional[List[Book]] = None
 
     @staticmethod
     def get_all_books() -> List[Book]:
         """Get all available books."""
-        return [
-            Book(
-                title=book_data["title"],
-                author=book_data["author"],
-                category=book_data["category"],
-                price=book_data["price"],
-                image_url=book_data["image_url"],
-            )
-            for book_data in BOOK_CATALOG
-        ]
+        if BookService._books_cache is None:
+            BookService._books_cache = [
+                Book(
+                    title=book_data["title"],
+                    author=book_data["author"],
+                    category=book_data["category"],
+                    price=book_data["price"],
+                    image_url=book_data["image_url"],
+                )
+                for book_data in BOOK_CATALOG
+            ]
+        return BookService._books_cache
 
     @staticmethod
     def get_book_by_title(title: str) -> Optional[Book]:

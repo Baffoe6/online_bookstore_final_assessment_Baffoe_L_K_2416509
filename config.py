@@ -22,7 +22,7 @@ class SecurityConfig:
     secret_key: str = "change-me-in-production"
     password_min_length: int = 8
     session_timeout: int = 3600  # 1 hour
-    bcrypt_rounds: int = 12
+    bcrypt_rounds: int = 10  # Reduced for better performance while maintaining security
 
 
 @dataclass
