@@ -1,10 +1,7 @@
 name: Notify
 
 on:
-  workflow_run:
-    workflows: [Run Tests, Security Scan, Code Quality]
-    types:
-      - completed
+  workflow_call: null
 
 jobs:
   notify:

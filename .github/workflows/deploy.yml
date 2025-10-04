@@ -1,13 +1,11 @@
 name: Deploy
 
 on:
-  push:
-    branches: [main, develop]
+  workflow_call: null
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    needs: [test, security, quality]
 
     steps:
     - uses: actions/checkout@v4
