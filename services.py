@@ -8,8 +8,7 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 
 from config import BOOK_CATALOG, DISCOUNT_CODES
-from models_refactored import (Book, Cart, CartItem, Order, User,
-                               ValidationUtils)
+from models_refactored import Book, Cart, CartItem, Order, User, ValidationUtils
 
 
 @dataclass

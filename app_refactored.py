@@ -14,12 +14,27 @@ import uuid
 from functools import wraps
 from typing import Dict, Optional
 
-from flask import (Flask, flash, jsonify, redirect, render_template, request,
-                   session, url_for)
+from flask import (
+    Flask,
+    flash,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 
 from config import DEMO_USER, ConfigManager
-from models_refactored import (Book, Cart, EmailService, Order, PaymentGateway,
-                               User, ValidationUtils)
+from models_refactored import (
+    Book,
+    Cart,
+    EmailService,
+    Order,
+    PaymentGateway,
+    User,
+    ValidationUtils,
+)
 from services import BookService, CartService
 from services import EmailService as EmailServiceService
 from services import OrderService, PaymentService, UserService

@@ -44,7 +44,7 @@ jobs:
       run: black --check --diff .
     
     - name: Import sorting check (isort)
-      run: isort --check-only --diff .
+      run: isort --check-only --diff . --profile black
     
     - name: Quick syntax check
       run: python -m py_compile **/*.py || true
