@@ -27,5 +27,4 @@ pylint>=3.0.2
 semgrep>=1.45.0
 gunicorn>=21.2.0
 waitress>=2.1.2
-cProfile-pretty>=0.1.0
 py-spy>=0.3.14
