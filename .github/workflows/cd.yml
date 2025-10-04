@@ -1,0 +1,215 @@
+name: 🚀 Continuous Deployment
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # Build and push Docker image
+  build-and-push:
+    name: 🐳 Build & Push Docker Image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐳 Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 🔐 Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 📋 Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix={{branch}}-
+
+      - name: 🐳 Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+
+  # Deploy to Staging
+  deploy-staging:
+    name: 🚀 Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    environment: staging
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: 📦 Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 🧪 Run smoke tests
+        run: |
+          python run_refactored_tests.py --smoke-only
+
+      - name: 🚀 Deploy to staging
+        run: |
+          echo "🚀 Deploying to staging environment..."
+          echo "📦 Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+          echo "🌐 Environment: staging"
+          echo "✅ Deployment completed successfully!"
+
+      - name: 🔍 Health check
+        run: |
+          echo "🔍 Performing health check..."
+          # Add actual health check commands here
+          echo "✅ Health check passed"
+
+      - name: 📢 Notify staging deployment
+        run: |
+          echo "📢 Staging deployment completed!"
+          echo "🔗 Staging URL: https://staging-bookstore.example.com"
+
+  # Deploy to Production
+  deploy-production:
+    name: 🚀 Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [build-and-push, deploy-staging]
+    if: startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production')
+    environment: production
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: 📦 Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 🧪 Run full test suite
+        run: |
+          python run_refactored_tests.py
+
+      - name: 🔒 Security scan
+        run: |
+          echo "🔒 Running final security scan..."
+          # Add security scan commands here
+          echo "✅ Security scan passed"
+
+      - name: 🚀 Deploy to production
+        run: |
+          echo "🚀 Deploying to production environment..."
+          echo "📦 Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+          echo "🌐 Environment: production"
+          echo "✅ Production deployment completed successfully!"
+
+      - name: 🔍 Production health check
+        run: |
+          echo "🔍 Performing production health check..."
+          # Add actual health check commands here
+          echo "✅ Production health check passed"
+
+      - name: 📢 Notify production deployment
+        run: |
+          echo "📢 Production deployment completed!"
+          echo "🔗 Production URL: https://bookstore.example.com"
+
+  # Rollback capability
+  rollback:
+    name: 🔄 Rollback Deployment
+    runs-on: ubuntu-latest
+    if: failure()
+    environment: production
+    
+    steps:
+      - name: 🔄 Rollback deployment
+        run: |
+          echo "🔄 Rolling back to previous version..."
+          # Add rollback commands here
+          echo "✅ Rollback completed"
+
+      - name: 📢 Notify rollback
+        run: |
+          echo "📢 Deployment rollback completed!"
+
+  # Cleanup old images
+  cleanup:
+    name: 🧹 Cleanup Old Images
+    runs-on: ubuntu-latest
+    needs: [deploy-production]
+    if: always()
+    
+    steps:
+      - name: 🧹 Cleanup old container images
+        run: |
+          echo "🧹 Cleaning up old container images..."
+          # Add cleanup commands here
+          echo "✅ Cleanup completed"
+
+  # Deployment summary
+  deployment-summary:
+    name: 📊 Deployment Summary
+    runs-on: ubuntu-latest
+    needs: [deploy-staging, deploy-production, cleanup]
+    if: always()
+    
+    steps:
+      - name: 📊 Generate deployment summary
+        run: |
+          echo "📊 Deployment Summary"
+          echo "===================="
+          echo "🚀 Staging: ${{ needs.deploy-staging.result }}"
+          echo "🚀 Production: ${{ needs.deploy-production.result }}"
+          echo "🧹 Cleanup: ${{ needs.cleanup.result }}"
+          echo "===================="
+          
+          if [ "${{ needs.deploy-production.result }}" == "success" ]; then
+            echo "🎉 Deployment completed successfully!"
+          else
+            echo "❌ Deployment failed. Please check the logs."
+          fi

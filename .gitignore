@@ -220,3 +220,113 @@ test_*.py
 *_test.py
 temp/
 tmp/
+
+# CI/CD and Build artifacts
+.github/workflows/.env
+.github/workflows/secrets/
+*.log
+*.out
+*.err
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+.docker/
+
+# Security and audit reports
+bandit-report.json
+safety-report.json
+semgrep-report.json
+trivy-results.sarif
+trivy-fs-results.sarif
+security-vulnerabilities.json
+security-updates.json
+audit-report.json
+licenses-report.json
+outdated-packages.json
+current-packages.json
+
+# Performance and benchmark results
+.benchmarks/
+performance-report.json
+*.prof
+
+# Coverage reports
+coverage.xml
+htmlcov/
+.coverage
+.coverage.*
+.pytest_cache/
+test-results.xml
+test-report.html
+
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Code quality
+.flake8
+.pylintrc
+.black
+.isort.cfg
+
+# Environment and configuration
+.env.local
+.env.development
+.env.test
+.env.production
+config.local.py
+config.development.py
+config.test.py
+config.production.py
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+data/
+logs/
+
+# SSL certificates
+ssl/
+*.pem
+*.key
+*.crt
+*.csr
+
+# Monitoring and observability
+prometheus.yml
+grafana/
+monitoring/
+
+# Nginx configuration
+nginx.conf
+nginx/
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.pid
+*.sock

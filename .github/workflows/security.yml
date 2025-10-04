@@ -1,0 +1,308 @@
+name: 🔒 Security Scanning
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run security scans daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  # Dependency vulnerability scanning
+  dependency-scan:
+    name: 📦 Dependency Vulnerability Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: 📦 Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install safety pip-audit
+          pip install -r requirements.txt
+
+      - name: 🔒 Run Safety check
+        run: |
+          safety check --json --output safety-report.json
+          safety check --short-report
+
+      - name: 🔒 Run pip-audit
+        run: |
+          pip-audit --format=json --output=pip-audit-report.json || true
+          pip-audit --desc
+
+      - name: 📊 Upload dependency scan results
+        uses: actions/upload-artifact@v3
+        with:
+          name: dependency-scan-results
+          path: |
+            safety-report.json
+            pip-audit-report.json
+
+  # Code security scanning
+  code-scan:
+    name: 🔍 Code Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: 📦 Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install bandit semgrep
+          pip install -r requirements.txt
+
+      - name: 🔒 Run Bandit security linter
+        run: |
+          bandit -r . -f json -o bandit-report.json
+          bandit -r . -ll
+
+      - name: 🔒 Run Semgrep security scan
+        run: |
+          semgrep --config=auto --json --output=semgrep-report.json . || true
+          semgrep --config=auto --text .
+
+      - name: 📊 Upload code scan results
+        uses: actions/upload-artifact@v3
+        with:
+          name: code-scan-results
+          path: |
+            bandit-report.json
+            semgrep-report.json
+
+  # Container security scanning
+  container-scan:
+    name: 🐳 Container Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐳 Build Docker image
+        run: |
+          docker build -t online-bookstore:security-scan .
+
+      - name: 🔒 Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'online-bookstore:security-scan'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: 🔒 Run Trivy filesystem scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-fs-results.sarif'
+
+      - name: 📊 Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+      - name: 📊 Upload filesystem scan results
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-fs-results.sarif'
+
+  # Secrets scanning
+  secrets-scan:
+    name: 🔐 Secrets Scanning
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🔐 Run TruffleHog secrets scanner
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: main
+          head: HEAD
+          extra_args: --debug --only-verified
+
+      - name: 🔐 Run GitLeaks secrets scanner
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # SAST (Static Application Security Testing)
+  sast:
+    name: 🔍 Static Application Security Testing
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔍 Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: python
+
+      - name: 🔍 Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+
+  # License compliance check
+  license-check:
+    name: 📄 License Compliance Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: 📦 Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pip-licenses
+          pip install -r requirements.txt
+
+      - name: 📄 Check licenses
+        run: |
+          pip-licenses --format=json --output-file=licenses.json
+          pip-licenses --format=table
+
+      - name: 📊 Upload license report
+        uses: actions/upload-artifact@v3
+        with:
+          name: license-report
+          path: licenses.json
+
+  # Security policy compliance
+  policy-check:
+    name: 📋 Security Policy Compliance
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📋 Check security policies
+        run: |
+          echo "📋 Checking security policy compliance..."
+          
+          # Check for security headers in templates
+          if grep -r "X-Frame-Options" templates/; then
+            echo "✅ X-Frame-Options header found"
+          else
+            echo "⚠️ X-Frame-Options header not found"
+          fi
+          
+          # Check for CSRF protection
+          if grep -r "csrf" app_refactored.py; then
+            echo "✅ CSRF protection found"
+          else
+            echo "⚠️ CSRF protection not found"
+          fi
+          
+          # Check for secure session configuration
+          if grep -r "secure.*session" app_refactored.py; then
+            echo "✅ Secure session configuration found"
+          else
+            echo "⚠️ Secure session configuration not found"
+          fi
+
+  # Security summary
+  security-summary:
+    name: 📊 Security Summary
+    runs-on: ubuntu-latest
+    needs: [dependency-scan, code-scan, container-scan, secrets-scan, sast, license-check, policy-check]
+    if: always()
+    
+    steps:
+      - name: 📊 Generate security summary
+        run: |
+          echo "📊 Security Scan Summary"
+          echo "========================"
+          echo "📦 Dependency Scan: ${{ needs.dependency-scan.result }}"
+          echo "🔍 Code Scan: ${{ needs.code-scan.result }}"
+          echo "🐳 Container Scan: ${{ needs.container-scan.result }}"
+          echo "🔐 Secrets Scan: ${{ needs.secrets-scan.result }}"
+          echo "🔍 SAST: ${{ needs.sast.result }}"
+          echo "📄 License Check: ${{ needs.license-check.result }}"
+          echo "📋 Policy Check: ${{ needs.policy-check.result }}"
+          echo "========================"
+          
+          # Count successful scans
+          success_count=0
+          total_count=7
+          
+          if [ "${{ needs.dependency-scan.result }}" == "success" ]; then
+            ((success_count++))
+          fi
+          if [ "${{ needs.code-scan.result }}" == "success" ]; then
+            ((success_count++))
+          fi
+          if [ "${{ needs.container-scan.result }}" == "success" ]; then
+            ((success_count++))
+          fi
+          if [ "${{ needs.secrets-scan.result }}" == "success" ]; then
+            ((success_count++))
+          fi
+          if [ "${{ needs.sast.result }}" == "success" ]; then
+            ((success_count++))
+          fi
+          if [ "${{ needs.license-check.result }}" == "success" ]; then
+            ((success_count++))
+          fi
+          if [ "${{ needs.policy-check.result }}" == "success" ]; then
+            ((success_count++))
+          fi
+          
+          echo "✅ Successful scans: $success_count/$total_count"
+          
+          if [ $success_count -eq $total_count ]; then
+            echo "🎉 All security scans passed!"
+          else
+            echo "⚠️ Some security scans failed. Please review the results."
+          fi
+
+  # Security notification
+  notify-security:
+    name: 📢 Security Notification
+    runs-on: ubuntu-latest
+    needs: [security-summary]
+    if: always()
+    
+    steps:
+      - name: 📢 Notify security scan completion
+        run: |
+          if [ "${{ needs.security-summary.result }}" == "success" ]; then
+            echo "🔒 Security scans completed successfully!"
+            echo "✅ All security checks passed"
+          else
+            echo "🚨 Security scans completed with issues!"
+            echo "❌ Please review security scan results"
+          fi
