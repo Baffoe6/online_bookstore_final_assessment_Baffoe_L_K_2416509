@@ -552,7 +552,7 @@ class PaymentGateway:
 
     @staticmethod
     def process_payment(
-        payment_info: Dict[str, str]
+        payment_info: Dict[str, str],
     ) -> Dict[str, Union[bool, str, Optional[str]]]:
         """Process payment with enhanced validation.
 
@@ -577,7 +577,7 @@ class PaymentGateway:
 
     @staticmethod
     def _process_credit_card(
-        payment_info: Dict[str, str]
+        payment_info: Dict[str, str],
     ) -> Dict[str, Union[bool, str, Optional[str]]]:
         """Process credit card payment with validation."""
         card_number = (payment_info.get("card_number") or "").replace(" ", "")
@@ -618,7 +618,7 @@ class PaymentGateway:
 
     @staticmethod
     def _process_paypal(
-        payment_info: Dict[str, str]
+        payment_info: Dict[str, str],
     ) -> Dict[str, Union[bool, str, Optional[str]]]:
         """Process PayPal payment with validation."""
         paypal_email = (payment_info.get("paypal_email") or "").strip()
