@@ -1,0 +1,54 @@
+{
+  "timestamp": 1758842995.038101,
+  "total_execution_time": 3.55983829498291,
+  "test_results": {
+    "run_unit_tests": {
+      "category": "unit_tests",
+      "success": false,
+      "execution_time": 0.9284746646881104,
+      "stdout": "",
+      "stderr": "ERROR: usage: __main__.py [options] [file_or_dir] [file_or_dir] [...]\n__main__.py: error: unrecognized arguments: --json-report --json-report-file=reports/unit-results.json\n  inifile: C:\\Users\\BAFFO\\Downloads\\software_testing_quality_engineer_Baffoe_L_K_2416509\\online-bookstore-final-assessment\\pytest.ini\n  rootdir: C:\\Users\\BAFFO\\Downloads\\software_testing_quality_engineer_Baffoe_L_K_2416509\\online-bookstore-final-assessment\n\n",
+      "returncode": 4
+    },
+    "run_integration_tests": {
+      "category": "integration_tests",
+      "success": false,
+      "execution_time": 0.9264566898345947,
+      "stdout": "",
+      "stderr": "ERROR: usage: __main__.py [options] [file_or_dir] [file_or_dir] [...]\n__main__.py: error: unrecognized arguments: --json-report --json-report-file=reports/integration-results.json\n  inifile: C:\\Users\\BAFFO\\Downloads\\software_testing_quality_engineer_Baffoe_L_K_2416509\\online-bookstore-final-assessment\\pytest.ini\n  rootdir: C:\\Users\\BAFFO\\Downloads\\software_testing_quality_engineer_Baffoe_L_K_2416509\\online-bookstore-final-assessment\n\n",
+      "returncode": 4
+    },
+    "run_security_tests": {
+      "category": "security_tests",
+      "success": false,
+      "execution_time": 0.9316558837890625,
+      "stdout": "",
+      "stderr": "ERROR: usage: __main__.py [options] [file_or_dir] [file_or_dir] [...]\n__main__.py: error: unrecognized arguments: --json-report --json-report-file=reports/security-results.json\n  inifile: C:\\Users\\BAFFO\\Downloads\\software_testing_quality_engineer_Baffoe_L_K_2416509\\online-bookstore-final-assessment\\pytest.ini\n  rootdir: C:\\Users\\BAFFO\\Downloads\\software_testing_quality_engineer_Baffoe_L_K_2416509\\online-bookstore-final-assessment\n\n",
+      "returncode": 4
+    },
+    "run_performance_tests": {
+      "category": "performance_tests",
+      "success": false,
+      "execution_time": 0.7692954540252686,
+      "stdout": "",
+      "stderr": "ERROR: usage: __main__.py [options] [file_or_dir] [file_or_dir] [...]\n__main__.py: error: unrecognized arguments: --json-report --json-report-file=reports/performance-results.json\n  inifile: C:\\Users\\BAFFO\\Downloads\\software_testing_quality_engineer_Baffoe_L_K_2416509\\online-bookstore-final-assessment\\pytest.ini\n  rootdir: C:\\Users\\BAFFO\\Downloads\\software_testing_quality_engineer_Baffoe_L_K_2416509\\online-bookstore-final-assessment\n\n",
+      "returncode": 4
+    }
+  },
+  "summary": {
+    "total_tests": 4,
+    "passed_tests": 0,
+    "failed_tests": 4,
+    "success_rate": 0.0,
+    "fastest_test": [
+      "run_performance_tests",
+      0.7692954540252686
+    ],
+    "slowest_test": [
+      "run_security_tests",
+      0.9316558837890625
+    ],
+    "performance_violations": [],
+    "within_time_budget": true
+  }
+}

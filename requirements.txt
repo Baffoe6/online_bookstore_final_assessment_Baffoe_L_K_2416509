@@ -2,3 +2,24 @@ flask==3.0.3
 werkzeug==3.0.3
 flask-WTF==1.0.1
 pytest==7.0.1
+pytest-cov==4.1.0
+coverage==7.3.2
+bcrypt==4.0.1
+# Performance and optimization tools
+psutil==5.9.6
+memory-profiler==0.61.0
+line-profiler==4.1.1
+pytest-benchmark==4.0.0
+pytest-xdist==3.3.1
+pytest-html==4.1.1
+pytest-json-report==1.5.0
+# Security and code quality tools
+bandit==1.7.5
+safety==2.3.4
+vulture==2.10
+complexity-report==0.3.2
+mypy==1.6.1
+black==23.10.1
+isort==5.12.0
+flake8==6.1.0
+pylint==3.0.2
