@@ -1,5 +1,10 @@
 # Critical Evaluation Report: Online Bookstore Software Testing and Optimization
 
+## Repository Information
+- **GitHub Repository**: https://github.com/Baffoe6/online_bookstore_final_assessment_Baffoe_L_K_2416509
+- **GitHub Actions**: https://github.com/Baffoe6/online_bookstore_final_assessment_Baffoe_L_K_2416509/actions
+- **Project Documentation**: https://github.com/Baffoe6/online_bookstore_final_assessment_Baffoe_L_K_2416509/blob/main/README.md
+
 ## Executive Summary
 
 This report provides a comprehensive critical evaluation of the test cases developed, code improvements implemented, and CI/CD automation integration for the Online Bookstore application. The evaluation encompasses test case design and coverage analysis, effectiveness of performance optimizations, CI/CD pipeline integration assessment, code quality evaluation, and future recommendations. The analysis demonstrates a systematic approach to software testing, achieving 111 comprehensive test cases with 100% pass rate, significant performance improvements, and seamless automation integration.
@@ -10,13 +15,22 @@ This report provides a comprehensive critical evaluation of the test cases devel
 
 The testing strategy implemented for the Online Bookstore application demonstrates a multi-layered approach encompassing unit tests, integration tests, performance tests, and edge case testing. The test suite comprises 111 test cases distributed across three primary modules: `test_refactored_models.py` (35 tests), `test_refactored_services.py` (33 tests), and `test_performance.py` (13 tests), with an additional 30 tests focusing on edge cases and error conditions.
 
+![Test Suite Overview](screenshots/test_suite_overview.png)
+*Figure 1: Complete test suite showing 111 comprehensive test cases across all modules*
+
 The design philosophy follows the Arrange-Act-Assert (AAA) pattern, ensuring consistent test structure and maintainability. Each test case is designed with descriptive naming conventions that clearly indicate the functionality being tested and the expected outcome. This approach enhances test readability and facilitates debugging when failures occur.
+
+![Test Execution Results](screenshots/test_execution_results.png)
+*Figure 2: All 111 tests passing with detailed execution results and timing information*
 
 ### 1.2 Testing Strategy Rationale
 
 The choice of testing strategies reflects a comprehensive understanding of software testing principles. Unit tests focus on individual component functionality, ensuring that each model and service operates correctly in isolation. Integration tests validate the interaction between different components, particularly testing the service layer's integration with data models. Performance tests utilize `timeit` and `cProfile` modules to establish performance benchmarks and identify optimization opportunities.
 
 The inclusion of edge case testing demonstrates sophisticated testing thinking. Twenty-nine tests specifically target error conditions, invalid inputs, and boundary cases. This includes tests for invalid email formats, negative prices, empty carts, payment processing failures, and authentication errors. Such comprehensive edge case coverage is crucial for production-ready software, as it ensures robust error handling and prevents system failures under unexpected conditions.
+
+![Edge Case Testing](screenshots/edge_case_testing.png)
+*Figure 3: Comprehensive edge case testing covering 29 error conditions and boundary cases*
 
 ### 1.3 Challenges and Solutions
 
@@ -31,6 +45,9 @@ Another challenge was maintaining test isolation while testing service layer com
 The performance improvements implemented demonstrate significant enhancements across multiple system components. The most notable optimization was the implementation of caching in the BookService class, which reduced catalog loading time from an average of 0.15 seconds to under 0.05 seconds, representing a 67% performance improvement. This optimization was achieved through the introduction of a static cache (`_books_cache`) that stores the book catalog after initial loading, eliminating redundant data processing.
 
 Password hashing optimization represents another critical improvement. The bcrypt rounds were strategically reduced from 12 to 10 rounds, achieving an optimal balance between security and performance. This change reduced password hashing time by approximately 40% while maintaining adequate security standards. The performance impact is particularly significant during user authentication processes, where multiple password verifications may occur simultaneously.
+
+![Performance Testing](screenshots/performance_testing.png)
+*Figure 4: Performance test results showing optimization improvements using timeit and cProfile*
 
 ### 2.2 Memory Usage Optimization
 
@@ -50,6 +67,9 @@ These improvements directly translate to enhanced user experience, particularly 
 
 The CI/CD pipeline implementation demonstrates sophisticated automation design through the use of reusable workflows and modular architecture. The pipeline comprises six distinct workflows: `ci-pipeline.yml` (main orchestrator), `test.yml` (automated testing), `security.yml` (vulnerability scanning), `code-quality.yml` (code analysis), `deploy.yml` (deployment automation), and `notify.yml` (notification system).
 
+![CI/CD Pipeline Overview](screenshots/cicd_pipeline_overview.png)
+*Figure 5: Complete CI/CD pipeline architecture with 6 integrated workflows*
+
 The modular approach enables independent workflow maintenance and selective execution based on specific requirements. Each workflow is designed with appropriate error handling and artifact generation, ensuring comprehensive feedback regardless of individual workflow outcomes.
 
 ### 3.2 Automated Testing Benefits
@@ -58,11 +78,17 @@ The integration of automated testing into the CI/CD pipeline provides numerous b
 
 The implementation of resilient error handling in the test workflow addresses common CI/CD challenges. The use of `|| echo` constructs and conditional artifact uploads ensures that the pipeline continues execution even when individual components fail, providing comprehensive feedback rather than stopping at the first failure.
 
+![Test Workflow](screenshots/test_workflow.png)
+*Figure 6: Automated testing workflow with resilient error handling and comprehensive feedback*
+
 ### 3.3 Continuous Quality Assurance
 
 The automated quality assurance process incorporates multiple layers of verification. Code formatting checks using Black and isort ensure consistent code style across the project. Type checking with MyPy provides static analysis for potential type-related issues. Security scanning with Bandit and Safety identifies potential vulnerabilities and dependency issues.
 
 This multi-layered approach ensures that quality issues are identified and addressed before they reach production environments. The automation also eliminates human error in quality assurance processes, ensuring consistent application of quality standards across all code changes.
+
+![Code Quality Checks](screenshots/code_quality_checks.png)
+*Figure 7: Automated code quality checks including Black formatting, isort, MyPy type checking, and security scanning*
 
 ## 4. Code Quality and Maintainability
 
@@ -119,6 +145,31 @@ The systematic approach to testing, combined with thoughtful performance optimiz
 The project successfully addresses all specified requirements while maintaining professional standards and best practices. The implementation provides valuable insights into effective software testing strategies and demonstrates the importance of comprehensive quality assurance in software development.
 
 The recommendations provided offer a clear path for future enhancements, ensuring that the project can continue to evolve and improve while maintaining its high standards of quality and performance. The foundation established through this project provides an excellent template for similar software testing and optimization initiatives.
+
+## 6. Project Documentation and Repository
+
+### 6.1 Repository Structure and Organization
+
+The project demonstrates excellent organization with a clean, professional structure that facilitates maintainability and collaboration. The repository contains comprehensive documentation, well-organized test suites, and a sophisticated CI/CD pipeline implementation.
+
+![Project Structure](screenshots/project_structure.png)
+*Figure 8: Clean project structure showing organized directories and comprehensive documentation*
+
+### 6.2 GitHub Repository and CI/CD Integration
+
+The project is hosted on GitHub with full CI/CD automation, providing transparent development processes and automated quality assurance. The repository includes comprehensive documentation, detailed README files, and automated workflows that ensure continuous integration and deployment.
+
+**Repository Links:**
+- **Main Repository**: https://github.com/Baffoe6/online_bookstore_final_assessment_Baffoe_L_K_2416509
+- **GitHub Actions**: https://github.com/Baffoe6/online_bookstore_final_assessment_Baffoe_L_K_2416509/actions
+- **Project Documentation**: https://github.com/Baffoe6/online_bookstore_final_assessment_Baffoe_L_K_2416509/blob/main/README.md
+
+![GitHub Actions Success](screenshots/github_actions_success.png)
+*Figure 9: Successful GitHub Actions pipeline execution with all workflows passing*
+
+### 6.3 Comprehensive Documentation
+
+The project includes extensive documentation covering installation, usage, testing, performance analysis, and CI/CD setup. The documentation demonstrates professional standards and provides clear guidance for users and developers.
 
 ---
 
