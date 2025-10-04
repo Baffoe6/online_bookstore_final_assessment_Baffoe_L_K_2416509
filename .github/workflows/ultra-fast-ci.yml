@@ -76,7 +76,7 @@ jobs:
         cache: 'pip'
     
     - name: Cache quality tools
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ~/.cache/pip
@@ -131,7 +131,7 @@ jobs:
     
     - name: Upload security reports
       if: matrix.check == 'security'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: security-reports
         path: |
@@ -162,7 +162,7 @@ jobs:
         cache: 'pip'
     
     - name: Cache test dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: |
           ~/.cache/pip
@@ -201,7 +201,7 @@ jobs:
     
     - name: Upload test reports
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: test-reports-${{ matrix.python-version }}-${{ matrix.test-category }}
         path: |
@@ -211,7 +211,7 @@ jobs:
     
     - name: Upload coverage to Codecov
       if: matrix.python-version == '3.11'
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         files: ./coverage-*.xml
         flags: ${{ matrix.test-category }}
@@ -256,7 +256,7 @@ jobs:
         echo "::endgroup::"
     
     - name: Upload performance reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: performance-analysis
         path: |
