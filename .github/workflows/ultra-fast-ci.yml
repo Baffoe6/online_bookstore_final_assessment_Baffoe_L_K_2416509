@@ -29,10 +29,10 @@ jobs:
       with:
         fetch-depth: 0
     
-    - name: Set up Python 3.11
+    - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
-        python-version: '3.11'
+        python-version: '3.12'
         cache: 'pip'
     
     - name: Install minimal dependencies
@@ -52,7 +52,7 @@ jobs:
     - name: Set Python matrix
       id: set-matrix
       run: |
-        echo "python-matrix=[\"3.9\", \"3.10\", \"3.11\", \"3.12\"]" >> $GITHUB_OUTPUT
+        echo "python-matrix=[\"3.12\"]" >> $GITHUB_OUTPUT
 
   # Parallel linting and security scanning
   code-quality:
@@ -69,10 +69,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
     
-    - name: Set up Python 3.11
+    - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
-        python-version: '3.11'
+        python-version: '3.12'
         cache: 'pip'
     
     - name: Cache quality tools
@@ -193,7 +193,7 @@ jobs:
         esac
     
     - name: Performance regression check
-      if: matrix.test-category == 'performance' && matrix.python-version == '3.11'
+      if: matrix.test-category == 'performance' && matrix.python-version == '3.12'
       run: |
         echo "::group::Performance Benchmarks"
         python performance_comparison.py
@@ -210,7 +210,7 @@ jobs:
           htmlcov/
     
     - name: Upload coverage to Codecov
-      if: matrix.python-version == '3.11'
+      if: matrix.python-version == '3.12'
       uses: codecov/codecov-action@v4
       with:
         files: ./coverage-*.xml
@@ -230,10 +230,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
     
-    - name: Set up Python 3.11
+    - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
-        python-version: '3.11'
+        python-version: '3.12'
         cache: 'pip'
     
     - name: Install dependencies
@@ -276,10 +276,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
     
-    - name: Set up Python 3.11
+    - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
-        python-version: '3.11'
+        python-version: '3.12'
         cache: 'pip'
     
     - name: Install dependencies

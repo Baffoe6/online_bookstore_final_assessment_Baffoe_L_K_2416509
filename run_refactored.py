@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Script to run the refactored Online Bookstore application."""
 
-import sys
 import os
+import sys
 
 # Add the current directory to Python path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -12,7 +12,7 @@ from config import ConfigManager
 
 if __name__ == "__main__":
     config = ConfigManager.load_config()
-    
+
     print("🚀 Starting Refactored Online Bookstore Application")
     print("=" * 50)
     print(f"📱 Host: {config.host}")
@@ -29,13 +29,9 @@ if __name__ == "__main__":
     print("=" * 50)
     print("🛑 Press Ctrl+C to stop the server")
     print("=" * 50)
-    
+
     try:
-        app.run(
-            debug=config.debug,
-            host=config.host,
-            port=config.port
-        )
+        app.run(debug=config.debug, host=config.host, port=config.port)
     except KeyboardInterrupt:
         print("\n👋 Server stopped by user")
     except Exception as e:

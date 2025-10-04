@@ -14,47 +14,46 @@ import uuid
 from functools import wraps
 from typing import Dict, Optional
 
-from flask import Flask, flash, jsonify, redirect, render_template, request, session, url_for
+from flask import (Flask, flash, jsonify, redirect, render_template, request,
+                   session, url_for)
 
-from config import ConfigManager, DEMO_USER
-from models_refactored import Book, Cart, EmailService, Order, PaymentGateway, User, ValidationUtils
-from services import (
-    BookService,
-    CartService,
-    EmailService as EmailServiceService,
-    OrderService,
-    PaymentService,
-    UserService,
-)
+from config import DEMO_USER, ConfigManager
+from models_refactored import (Book, Cart, EmailService, Order, PaymentGateway,
+                               User, ValidationUtils)
+from services import BookService, CartService
+from services import EmailService as EmailServiceService
+from services import OrderService, PaymentService, UserService
 
 
 def create_app() -> Flask:
     """Application factory pattern for creating Flask app."""
     app = Flask(__name__)
-    
+
     # Load configuration
     config = ConfigManager.load_config()
-    app.config.update({
-        'SECRET_KEY': config.security.secret_key,
-        'DEBUG': config.debug,
-    })
-    
+    app.config.update(
+        {
+            "SECRET_KEY": config.security.secret_key,
+            "DEBUG": config.debug,
+        }
+    )
+
     # Initialize global storage (in production, use database)
     users: Dict[str, User] = {}
     orders: Dict[str, Order] = {}
     cart: Cart = Cart()
-    
+
     # Make storage available to services (temporary solution)
     app.users = users
     app.orders = orders
     app.cart = cart
-    
+
     # Seed demo user
     _seed_demo_user(users)
-    
+
     # Register routes
     _register_routes(app, users, orders, cart)
-    
+
     return app
 
 
@@ -70,9 +69,11 @@ def _seed_demo_user(users: Dict[str, User]) -> None:
         )
 
 
-def _register_routes(app: Flask, users: Dict[str, User], orders: Dict[str, Order], cart: Cart) -> None:
+def _register_routes(
+    app: Flask, users: Dict[str, User], orders: Dict[str, Order], cart: Cart
+) -> None:
     """Register all application routes."""
-    
+
     def get_current_user() -> Optional[User]:
         """Get current logged-in user."""
         email = session.get("user_email")
@@ -82,19 +83,23 @@ def _register_routes(app: Flask, users: Dict[str, User], orders: Dict[str, Order
 
     def login_required(func):
         """Decorator to require login for certain routes."""
+
         @wraps(func)
         def wrapper(*args, **kwargs):
             if "user_email" not in session:
                 flash("Please log in to access this page.", "error")
                 return redirect(url_for("login"))
             return func(*args, **kwargs)
+
         return wrapper
 
     @app.route("/")
     def index():
         """Home page with book catalog."""
         books = BookService.get_all_books()
-        return render_template("index.html", books=books, cart=cart, current_user=get_current_user())
+        return render_template(
+            "index.html", books=books, cart=cart, current_user=get_current_user()
+        )
 
     @app.route("/add-to-cart", methods=["POST"])
     def add_to_cart():
@@ -109,12 +114,12 @@ def _register_routes(app: Flask, users: Dict[str, User], orders: Dict[str, Order
             return redirect(url_for("index"))
 
         result = CartService.add_to_cart(cart, book_title, quantity)
-        
+
         if result.success:
             flash(result.message, "success")
         else:
             flash(result.message, "error")
-            
+
         return redirect(url_for("index"))
 
     @app.route("/remove-from-cart", methods=["POST"])
@@ -200,7 +205,9 @@ def _register_routes(app: Flask, users: Dict[str, User], orders: Dict[str, Order
 
         shipping_info = _collect_shipping_info()
         payment_info = _collect_payment_info()
-        discount_code = ValidationUtils.normalize_discount_code(request.form.get("discount_code"))
+        discount_code = ValidationUtils.normalize_discount_code(
+            request.form.get("discount_code")
+        )
 
         # Validate shipping information
         required_fields = ["name", "email", "address", "city", "zip_code"]
@@ -222,8 +229,8 @@ def _register_routes(app: Flask, users: Dict[str, User], orders: Dict[str, Order
         # Calculate total with discount
         total_amount = cart.get_total_price()
         if discount_code:
-            new_total, discount_amount, discount_message = OrderService.calculate_discount(
-                total_amount, discount_code
+            new_total, discount_amount, discount_message = (
+                OrderService.calculate_discount(total_amount, discount_code)
             )
             if discount_message:
                 if "Invalid" in discount_message:
@@ -243,7 +250,10 @@ def _register_routes(app: Flask, users: Dict[str, User], orders: Dict[str, Order
             shipping_info["email"],
             cart.get_items(),
             shipping_info,
-            {"method": payment_info["payment_method"], "transaction_id": payment_result["transaction_id"]},
+            {
+                "method": payment_info["payment_method"],
+                "transaction_id": payment_result["transaction_id"],
+            },
             total_amount,
         )
 
@@ -255,7 +265,9 @@ def _register_routes(app: Flask, users: Dict[str, User], orders: Dict[str, Order
         order_id = order_result.data["order_id"]
 
         # Send confirmation email
-        email_result = EmailServiceService.send_order_confirmation(shipping_info["email"], order)
+        email_result = EmailServiceService.send_order_confirmation(
+            shipping_info["email"], order
+        )
         if not email_result.success:
             # Don't fail the order for email issues, just log
             print(f"Email sending failed: {email_result.message}")
@@ -273,7 +285,9 @@ def _register_routes(app: Flask, users: Dict[str, User], orders: Dict[str, Order
         if not order:
             flash("Order not found", "error")
             return redirect(url_for("index"))
-        return render_template("order_confirmation.html", order=order, current_user=get_current_user())
+        return render_template(
+            "order_confirmation.html", order=order, current_user=get_current_user()
+        )
 
     @app.route("/register", methods=["GET", "POST"])
     def register():
@@ -285,7 +299,7 @@ def _register_routes(app: Flask, users: Dict[str, User], orders: Dict[str, Order
             address = request.form.get("address", "").strip()
 
             result = UserService.register_user(email, password, name, address)
-            
+
             if result.success:
                 session["user_email"] = result.data["email"]
                 flash("Account created successfully! You are now logged in.", "success")
@@ -303,7 +317,7 @@ def _register_routes(app: Flask, users: Dict[str, User], orders: Dict[str, Order
             password = request.form.get("password", "")
 
             result = UserService.authenticate_user(email_raw, password)
-            
+
             if result.success:
                 session["user_email"] = result.data["email"]
                 flash("Logged in successfully!", "success")
@@ -337,7 +351,9 @@ def _register_routes(app: Flask, users: Dict[str, User], orders: Dict[str, Order
 
         try:
             current_user.name = request.form.get("name", current_user.name).strip()
-            current_user.address = request.form.get("address", current_user.address).strip()
+            current_user.address = request.form.get(
+                "address", current_user.address
+            ).strip()
 
             new_password = request.form.get("new_password", "").strip()
             if new_password:
@@ -362,7 +378,7 @@ def _register_routes(app: Flask, users: Dict[str, User], orders: Dict[str, Order
         query = request.args.get("q", "")
         if not query:
             return jsonify([])
-        
+
         books = BookService.search_books(query)
         return jsonify([book.to_dict() for book in books])
 
@@ -401,8 +417,4 @@ app = create_app()
 
 if __name__ == "__main__":
     config = ConfigManager.load_config()
-    app.run(
-        debug=config.debug,
-        host=config.host,
-        port=config.port
-    )
+    app.run(debug=config.debug, host=config.host, port=config.port)

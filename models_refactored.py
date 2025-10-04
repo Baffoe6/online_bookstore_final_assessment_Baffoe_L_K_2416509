@@ -14,16 +14,15 @@ import re
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Dict, List, Optional, Union
 from decimal import Decimal
+from typing import Dict, List, Optional, Union
 
 import bcrypt
-
 
 __all__ = [
     "Book",
     "Cart",
-    "CartItem", 
+    "CartItem",
     "EmailService",
     "Order",
     "PaymentGateway",
@@ -41,32 +40,32 @@ class ValidationUtils:
     @staticmethod
     def normalize_email(email: str) -> str:
         """Normalize email addresses for case-insensitive comparisons.
-        
+
         Args:
             email: Raw email input
-            
+
         Returns:
             Normalized email address
-            
+
         Raises:
             ValueError: If email is invalid or empty
         """
         if not email or not isinstance(email, str):
             raise ValueError("Email address is required")
-        
+
         normalized = email.strip().lower()
         if not normalized:
             raise ValueError("Email address cannot be empty")
-            
+
         return normalized
 
     @classmethod
     def validate_email(cls, email: str) -> bool:
         """Validate email format using pre-compiled regex.
-        
+
         Args:
             email: Email address to validate
-            
+
         Returns:
             True if email format is valid, False otherwise
         """
@@ -75,16 +74,18 @@ class ValidationUtils:
         return cls._email_pattern.match(email.strip()) is not None
 
     @classmethod
-    def validate_quantity(cls, quantity: Union[str, int, float], *, allow_zero: bool = False) -> int:
+    def validate_quantity(
+        cls, quantity: Union[str, int, float], *, allow_zero: bool = False
+    ) -> int:
         """Validate and coerce quantity inputs with comprehensive error handling.
-        
+
         Args:
             quantity: Input quantity (string, int, or float)
             allow_zero: Whether zero quantities are allowed
-            
+
         Returns:
             Validated integer quantity
-            
+
         Raises:
             ValueError: If quantity is invalid
         """
@@ -115,10 +116,10 @@ class ValidationUtils:
     @staticmethod
     def normalize_discount_code(code: Optional[str]) -> str:
         """Normalize discount codes for case-insensitive comparisons.
-        
+
         Args:
             code: Raw discount code
-            
+
         Returns:
             Normalized discount code (uppercase, trimmed)
         """
@@ -127,10 +128,10 @@ class ValidationUtils:
     @classmethod
     def validate_card_number(cls, card_number: str) -> bool:
         """Validate credit card number format.
-        
+
         Args:
             card_number: Card number to validate
-            
+
         Returns:
             True if card number format is valid
         """
@@ -156,20 +157,20 @@ class Book:
         # Validate required fields
         if not self.title or not self.title.strip():
             raise ValueError("Book title is required")
-        
+
         # Normalize string fields
-        object.__setattr__(self, 'title', self.title.strip())
-        object.__setattr__(self, 'author', self.author.strip())
-        object.__setattr__(self, 'category', self.category.strip())
-        object.__setattr__(self, 'description', self.description.strip())
-        
+        object.__setattr__(self, "title", self.title.strip())
+        object.__setattr__(self, "author", self.author.strip())
+        object.__setattr__(self, "category", self.category.strip())
+        object.__setattr__(self, "description", self.description.strip())
+
         # Validate price
         if self.price < 0:
             raise ValueError("Book price cannot be negative")
-        object.__setattr__(self, 'price', float(self.price))
-        
+        object.__setattr__(self, "price", float(self.price))
+
         # Backwards compatibility for templates/tests
-        object.__setattr__(self, 'image', self.image_url)
+        object.__setattr__(self, "image", self.image_url)
 
     @property
     def formatted_price(self) -> str:
@@ -193,11 +194,11 @@ class CartItem:
 
     def __init__(self, book: Book, quantity: int = 1):
         """Initialize cart item with validation.
-        
+
         Args:
             book: Book object
             quantity: Item quantity (default: 1)
-            
+
         Raises:
             ValueError: If quantity is invalid
         """
@@ -214,10 +215,10 @@ class CartItem:
 
     def update_quantity(self, quantity: int) -> None:
         """Update item quantity with validation.
-        
+
         Args:
             quantity: New quantity
-            
+
         Raises:
             ValueError: If quantity is invalid
         """
@@ -241,15 +242,17 @@ class Cart:
 
     def add_book(self, book: Book, quantity: Union[int, str] = 1) -> None:
         """Add book to cart with quantity validation.
-        
+
         Args:
             book: Book to add
             quantity: Quantity to add (default: 1)
-            
+
         Raises:
             ValueError: If quantity is invalid
         """
-        normalized_quantity = ValidationUtils.validate_quantity(quantity, allow_zero=True)
+        normalized_quantity = ValidationUtils.validate_quantity(
+            quantity, allow_zero=True
+        )
         if normalized_quantity == 0:
             return  # Treat zero as no-op
 
@@ -261,7 +264,7 @@ class Cart:
 
     def remove_book(self, book_title: str) -> None:
         """Remove book from cart.
-        
+
         Args:
             book_title: Title of book to remove
         """
@@ -269,18 +272,20 @@ class Cart:
 
     def update_quantity(self, book_title: str, quantity: Union[int, str]) -> None:
         """Update book quantity with validation.
-        
+
         Args:
             book_title: Title of book to update
             quantity: New quantity
-            
+
         Raises:
             ValueError: If quantity is invalid
         """
         if book_title not in self.items:
             return
 
-        normalized_quantity = ValidationUtils.validate_quantity(quantity, allow_zero=True)
+        normalized_quantity = ValidationUtils.validate_quantity(
+            quantity, allow_zero=True
+        )
         if normalized_quantity == 0:
             del self.items[book_title]
         else:
@@ -330,23 +335,23 @@ class User:
 
     def __init__(self, email: str, password: str, name: str = "", address: str = ""):
         """Initialize user with validation and password hashing.
-        
+
         Args:
             email: User email address
             password: User password (will be hashed)
             name: User's full name
             address: User's address
-            
+
         Raises:
             ValueError: If email or password is invalid
         """
         self.email = ValidationUtils.normalize_email(email)
-        
+
         if not password:
             raise ValueError("Password is required")
         if len(password) < 8:
             raise ValueError("Password must be at least 8 characters long")
-            
+
         self._password_hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
         self.name = name.strip()
         self.address = address.strip()
@@ -361,10 +366,10 @@ class User:
 
     def verify_password(self, password: str) -> bool:
         """Verify password against stored hash.
-        
+
         Args:
             password: Password to verify
-            
+
         Returns:
             True if password is correct
         """
@@ -374,10 +379,10 @@ class User:
 
     def change_password(self, new_password: str) -> None:
         """Change user password with validation.
-        
+
         Args:
             new_password: New password
-            
+
         Raises:
             ValueError: If new password is invalid
         """
@@ -385,12 +390,14 @@ class User:
             raise ValueError("New password must not be empty")
         if len(new_password) < 8:
             raise ValueError("New password must be at least 8 characters long")
-            
-        self._password_hash = bcrypt.hashpw(new_password.encode("utf-8"), bcrypt.gensalt())
+
+        self._password_hash = bcrypt.hashpw(
+            new_password.encode("utf-8"), bcrypt.gensalt()
+        )
 
     def add_order(self, order: Order) -> None:
         """Add order to user's order history.
-        
+
         Args:
             order: Order to add
         """
@@ -398,16 +405,18 @@ class User:
 
     def get_order_history(self, *, sorted_by_date: bool = True) -> List[Order]:
         """Get user's order history.
-        
+
         Args:
             sorted_by_date: Whether to sort orders by date (newest first)
-            
+
         Returns:
             List of user's orders
         """
         if sorted_by_date and self.orders:
             # Create a copy to avoid modifying the original list
-            sorted_orders = sorted(self.orders, key=lambda order: order.order_date, reverse=True)
+            sorted_orders = sorted(
+                self.orders, key=lambda order: order.order_date, reverse=True
+            )
             return sorted_orders
         return self.orders.copy()
 
@@ -465,7 +474,9 @@ class Order:
 
             # Set defaults and validate
             order_id = order_id or str(uuid.uuid4())[:8].upper()
-            user_email = ValidationUtils.normalize_email(user_email or "") if user_email else ""
+            user_email = (
+                ValidationUtils.normalize_email(user_email or "") if user_email else ""
+            )
             items = list(items or [])
             shipping_info = shipping_info or {}
             payment_info = payment_info or {}
@@ -496,11 +507,17 @@ class Order:
 
     def update_status(self, new_status: str) -> None:
         """Update order status.
-        
+
         Args:
             new_status: New status for the order
         """
-        valid_statuses = ["Confirmed", "Processing", "Shipped", "Delivered", "Cancelled"]
+        valid_statuses = [
+            "Confirmed",
+            "Processing",
+            "Shipped",
+            "Delivered",
+            "Cancelled",
+        ]
         if new_status not in valid_statuses:
             raise ValueError(f"Invalid status: {new_status}")
         self.status = new_status
@@ -532,12 +549,14 @@ class PaymentGateway:
     """Enhanced payment gateway with comprehensive validation."""
 
     @staticmethod
-    def process_payment(payment_info: Dict[str, str]) -> Dict[str, Union[bool, str, Optional[str]]]:
+    def process_payment(
+        payment_info: Dict[str, str]
+    ) -> Dict[str, Union[bool, str, Optional[str]]]:
         """Process payment with enhanced validation.
-        
+
         Args:
             payment_info: Payment information dictionary
-            
+
         Returns:
             Dictionary with success status, message, and transaction ID
         """
@@ -555,7 +574,9 @@ class PaymentGateway:
             }
 
     @staticmethod
-    def _process_credit_card(payment_info: Dict[str, str]) -> Dict[str, Union[bool, str, Optional[str]]]:
+    def _process_credit_card(
+        payment_info: Dict[str, str]
+    ) -> Dict[str, Union[bool, str, Optional[str]]]:
         """Process credit card payment with validation."""
         card_number = (payment_info.get("card_number") or "").replace(" ", "")
         expiry_date = (payment_info.get("expiry_date") or "").strip()
@@ -594,17 +615,19 @@ class PaymentGateway:
         }
 
     @staticmethod
-    def _process_paypal(payment_info: Dict[str, str]) -> Dict[str, Union[bool, str, Optional[str]]]:
+    def _process_paypal(
+        payment_info: Dict[str, str]
+    ) -> Dict[str, Union[bool, str, Optional[str]]]:
         """Process PayPal payment with validation."""
         paypal_email = (payment_info.get("paypal_email") or "").strip()
-        
+
         if not paypal_email:
             return {
                 "success": False,
                 "message": "Payment failed: PayPal email required",
                 "transaction_id": None,
             }
-            
+
         if not ValidationUtils.validate_email(paypal_email):
             return {
                 "success": False,
@@ -627,11 +650,11 @@ class EmailService:
     @staticmethod
     def send_order_confirmation(user_email: str, order: Order) -> bool:
         """Send order confirmation email with enhanced formatting.
-        
+
         Args:
             user_email: Recipient email address
             order: Order object
-            
+
         Returns:
             True if email was sent successfully
         """
@@ -650,19 +673,23 @@ class EmailService:
             print(f"Order ID: {order.order_id}")
             print(f"Total: {order.get_formatted_total()}")
             print(f"Items ({order.get_item_count()}):")
-            
+
             for item in order.items:
-                print(f"  • {item.book.title} x{item.quantity} @ {item.book.formatted_price}")
-            
+                print(
+                    f"  • {item.book.title} x{item.quantity} @ {item.book.formatted_price}"
+                )
+
             if order.shipping_info:
                 print(f"\nShipping to:")
                 print(f"  {order.shipping_info.get('name', 'N/A')}")
                 print(f"  {order.shipping_info.get('address', 'N/A')}")
-                print(f"  {order.shipping_info.get('city', 'N/A')}, {order.shipping_info.get('zip_code', 'N/A')}")
-            
+                print(
+                    f"  {order.shipping_info.get('city', 'N/A')}, {order.shipping_info.get('zip_code', 'N/A')}"
+                )
+
             print("=" * 50 + "\n")
             return True
-            
+
         except Exception as exc:
             print(f"ERROR sending email: {exc}")
             return False
