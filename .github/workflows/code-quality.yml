@@ -11,12 +11,12 @@ jobs:
 
     - name: Install tools
       run: |
-        pip install black isort mypy pylint
         pip install -r requirements.txt
+        pip install isort mypy pylint
 
     - name: Run checks
       run: |
-        black --check --diff .
+        black --check --diff . --line-length 88
         isort --check-only --diff . --profile black
         mypy --ignore-missing-imports app_refactored.py models_refactored.py --no-error-summary || echo "⚠️ MyPy found type issues (non-blocking)"
         pylint app_refactored.py models_refactored.py --output-format=json > pylint-report.json || true
