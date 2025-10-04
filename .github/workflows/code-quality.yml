@@ -1,0 +1,28 @@
+name: Code Quality
+
+on:
+  workflow_call:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install tools
+      run: |
+        pip install black isort mypy pylint
+        pip install -r requirements.txt
+
+    - name: Run checks
+      run: |
+        black --check --diff .
+        isort --check-only --diff .
+        mypy --ignore-missing-imports app.py models.py
+        pylint app.py models.py --output-format=json > pylint-report.json || true
+
+    - name: Upload report
+      uses: actions/upload-artifact@v4
+      with:
+        name: code-quality-report
+        path: pylint-report.json

@@ -1,0 +1,21 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main, develop]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [test, security, quality]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Deploy to environment
+      run: |
+        if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+          echo "Deploying to production..."
+        else
+          echo "Deploying to staging..."
+        fi

@@ -1,0 +1,15 @@
+name: Notify
+
+on:
+  workflow_run:
+    workflows: [Run Tests, Security Scan, Code Quality]
+    types:
+      - completed
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Notify result
+      run: |
+        echo "CI/CD pipeline completed."
