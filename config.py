@@ -146,7 +146,7 @@ DISCOUNT_CODES = {
 # Demo user configuration
 DEMO_USER = {
     "email": "demo@bookstore.com",
-    "password": "demo123",
+    "password": "demo1234",
     "name": "Demo User",
     "address": "123 Demo Street, Demo City, DC 12345"
 }

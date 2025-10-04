@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 
 from config import DISCOUNT_CODES, BOOK_CATALOG
-from models import Book, Cart, CartItem, User, Order, ValidationUtils
+from models_refactored import Book, Cart, CartItem, User, Order, ValidationUtils
 
 
 @dataclass
@@ -168,7 +168,8 @@ class UserService:
             
             # Check if user already exists (this would be a database check in production)
             # For now, we'll assume users dict is available globally
-            from app import users  # This is a temporary solution
+            from app_refactored import app  # This is a temporary solution
+            users = app.users
             
             if normalized_email in users:
                 return ServiceResult(
@@ -206,7 +207,8 @@ class UserService:
             normalized_email = ValidationUtils.normalize_email(email)
             
             # This would be a database lookup in production
-            from app import users  # This is a temporary solution
+            from app_refactored import app  # This is a temporary solution
+            users = app.users
             
             user = users.get(normalized_email)
             
@@ -282,11 +284,13 @@ class OrderService:
             )
             
             # Store order (this would be database storage in production)
-            from app import orders  # This is a temporary solution
+            from app_refactored import app  # This is a temporary solution
+            orders = app.orders
             orders[order_id] = order
             
             # Add order to user if logged in
-            from app import users  # This is a temporary solution
+            from app_refactored import app  # This is a temporary solution
+            users = app.users
             user = users.get(user_email)
             if user:
                 user.add_order(order)
@@ -307,7 +311,8 @@ class OrderService:
     @staticmethod
     def get_order_by_id(order_id: str) -> Optional[Order]:
         """Get an order by its ID."""
-        from app import orders  # This is a temporary solution
+        from app_refactored import app  # This is a temporary solution
+        orders = app.orders
         return orders.get(order_id)
 
 
@@ -363,7 +368,7 @@ class PaymentService:
         if not paypal_email:
             return ServiceResult(
                 success=False,
-                message="Please enter your PayPal email address",
+                message="PayPal email required",
                 error_code="MISSING_PAYPAL_EMAIL"
             )
         
@@ -419,3 +424,9 @@ class EmailService:
                 message=f"Failed to send email: {e}",
                 error_code="EMAIL_SEND_ERROR"
             )
+
+
+# Global storage for testing purposes
+# These are used by the test suite to mock data
+users = {}
+orders = {}
