@@ -19,22 +19,11 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Verify dependencies
-      run: |
-        echo "🔍 Verifying core dependencies..."
-        python -c "import pytest, coverage, bcrypt, flask, werkzeug; print('✅ Core dependencies verified')" || exit 1
-        echo "🔍 Verifying model imports..."
-        python -c "from models_refactored import Book; print('✅ Models import verified')" || exit 1
-        echo "🔍 Verifying config imports..."
-        python -c "from config import BOOK_CATALOG; print('✅ Config import verified')" || exit 1
-        echo "✅ All dependencies verified successfully"
-
-    - name: Run all tests
+    - name: Run tests
       run: |
         echo "🧪 Running test suite..."
         python -m pytest tests/ -v --tb=short --junitxml=report.xml
         echo "✅ Tests completed successfully"
-        echo "📊 Test report generated: report.xml"
 
     - name: Upload test report
       uses: actions/upload-artifact@v4
