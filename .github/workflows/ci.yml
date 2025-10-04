@@ -104,7 +104,7 @@ jobs:
 
       - name: 🧪 Run tests with coverage
         run: |
-          pytest tests/ \
+          python -m pytest tests/ \
             --cov=models_refactored \
             --cov=services \
             --cov=config \
@@ -150,7 +150,7 @@ jobs:
 
       - name: ⚡ Run performance tests
         run: |
-          pytest tests/ -k "performance" --benchmark-only --benchmark-save=performance-report || true
+          python -m pytest tests/ -k "performance" --benchmark-only --benchmark-save=performance-report || true
 
       - name: 📊 Upload performance results
         uses: actions/upload-artifact@v4

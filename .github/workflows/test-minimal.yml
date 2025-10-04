@@ -28,8 +28,8 @@ jobs:
 
       - name: 🧪 Run basic tests
         run: |
-          pytest tests/ -v
+          python -m pytest tests/ -v
 
       - name: 🧪 Run tests with coverage
         run: |
-          pytest tests/ --cov=models_refactored --cov=services --cov=config -v
+          python -m pytest tests/ --cov=models_refactored --cov=services --cov=config -v
