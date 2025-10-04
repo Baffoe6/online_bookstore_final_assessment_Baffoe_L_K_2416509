@@ -132,7 +132,7 @@ jobs:
           fetch-depth: 0
 
       - name: 📦 Download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: release-artifacts
           path: ./artifacts
@@ -251,7 +251,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
 
   # Update documentation
   update-docs:

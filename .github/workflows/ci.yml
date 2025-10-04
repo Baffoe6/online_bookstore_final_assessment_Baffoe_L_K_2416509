@@ -49,7 +49,7 @@ jobs:
         run: safety check --json --output safety-report.json || true
 
       - name: 📊 Upload security reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: security-reports
@@ -125,7 +125,7 @@ jobs:
           fail_ci_if_error: false
 
       - name: 📊 Upload test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-results-python-${{ matrix.python-version }}
           path: |
@@ -157,7 +157,7 @@ jobs:
           pytest tests/ -k "performance" --benchmark-only --benchmark-save=performance-report || true
 
       - name: 📊 Upload performance results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: performance-results
@@ -182,6 +182,7 @@ jobs:
           tags: online-bookstore:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          platforms: linux/amd64
 
       - name: 🧪 Test Docker image
         run: |
@@ -219,7 +220,7 @@ jobs:
         run: semgrep --config=auto --json --output=semgrep-report.json . || true
 
       - name: 📊 Upload security reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: security-scan-results
           path: |

@@ -61,8 +61,9 @@ COPY run_refactored_tests.py .
 COPY static/ ./static/
 COPY templates/ ./templates/
 
-# Copy tests (for running tests in container)
-COPY tests/ ./tests/
+# Copy tests directory (create empty if doesn't exist)
+RUN mkdir -p ./tests
+COPY tests/ ./tests/ || true
 
 # Create necessary directories
 RUN mkdir -p /app/logs /app/data

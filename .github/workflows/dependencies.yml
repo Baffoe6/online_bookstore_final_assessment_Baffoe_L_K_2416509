@@ -51,7 +51,7 @@ jobs:
           pip list --format=json > current-packages.json
 
       - name: 📊 Upload dependency reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: dependency-reports
           path: |
@@ -88,7 +88,7 @@ jobs:
           pip-audit --desc
 
       - name: 📊 Upload security reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: security-reports
           path: |
@@ -231,7 +231,7 @@ jobs:
           pip-licenses --format=json --output-file=licenses-report.json || true
 
       - name: 📊 Upload audit reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: audit-reports
           path: |
