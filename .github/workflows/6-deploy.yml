@@ -71,7 +71,7 @@ jobs:
       id: meta
       uses: docker/metadata-action@v5
       with:
-        images: bookstore/online-bookstore
+        images: baffoe6/online-bookstore
         tags: |
           type=ref,event=branch
           type=ref,event=pr
