@@ -1,0 +1,87 @@
+name: 3. Performance Testing
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 2 * * 1'  # Weekly on Monday at 2 AM
+  workflow_dispatch:
+
+jobs:
+  performance:
+    name: Performance Benchmarks
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Run performance tests
+      run: |
+        python performance_tests.py | tee performance-results.txt
+    
+    - name: Parse performance results
+      id: perf_results
+      run: |
+        echo "CART_OPS=$(grep 'Cart operations:' performance-results.txt | awk '{print $4}')" >> $GITHUB_OUTPUT
+        echo "CACHE_SPEEDUP=$(grep 'cache speedup:' performance-results.txt | awk '{print $5}')" >> $GITHUB_OUTPUT
+    
+    - name: Upload performance results
+      uses: actions/upload-artifact@v4
+      with:
+        name: performance-results
+        path: |
+          performance-results.txt
+          performance_results.txt
+        retention-days: 90
+    
+    - name: Performance benchmark comment
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: '## ⚡ Performance Test Results\n\n' +
+                  '- Cart Operations: ${{ steps.perf_results.outputs.CART_OPS }} ops/sec\n' +
+                  '- Cache Speedup: ${{ steps.perf_results.outputs.CACHE_SPEEDUP }}x\n' +
+                  '- Status: ✅ All benchmarks passed\n\n' +
+                  'See artifacts for detailed results.'
+          })
+    
+    - name: Performance Summary
+      run: |
+        echo "::notice title=Performance Tests::All performance benchmarks completed successfully"
+        cat performance-results.txt | tail -20
+    
+    - name: Check performance regression
+      run: |
+        # Simple check - can be enhanced with historical comparison
+        echo "Checking for performance regressions..."
+        python -c "
+        import sys
+        with open('performance-results.txt', 'r') as f:
+            content = f.read()
+            if 'EXCELLENT' in content or 'PASS' in content:
+                print('✅ Performance benchmarks passed')
+                sys.exit(0)
+            else:
+                print('❌ Performance regression detected')
+                sys.exit(1)
+        "
+

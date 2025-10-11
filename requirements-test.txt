@@ -1,0 +1,22 @@
+# Testing dependencies for Online Bookstore application
+
+# Core testing framework
+pytest==7.4.3
+pytest-cov==4.1.0
+pytest-mock==3.12.0
+
+# Flask testing
+pytest-flask==1.3.0
+
+# Code coverage
+coverage==7.3.2
+
+# Test utilities
+faker==20.1.0
+freezegun==1.4.0
+
+# Required application dependencies
+Flask==3.0.0
+bcrypt==4.1.1
+Werkzeug==3.0.1
+
